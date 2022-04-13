@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { combineLatest, map, Observable, tap } from 'rxjs';
 import { AppDataApiService } from '../app-data/app-data-api.service';
-import { CommonServiceService } from '../app-data/common-service.service';
+import { CustomerService } from '../app-data/customer.service';
 import { Customer } from '../models/customer.interface';
 import { Product } from '../models/product.interface';
 interface OrderView {
@@ -12,10 +12,9 @@ interface OrderView {
 }
 @Component({
   template: `
-    <select [ngModel]="commonService.selectedCustomer$ | async"
-    (ngModelChange)="customerSelected($event)">
-      <option [ngValue]="null"> ALL</option>
-      <option *ngFor="let customer of customers$ | async" [ngValue]="customer" >{{ customer.name}}</option>
+    <select (change)="customerSelected($event)">
+      <option [value]=0> ALL</option>
+      <option  *ngFor="let customer of customers$ | async" [selected]="(customerService.selectedCustomer$ | async)==customer.id" [value]=customer.id >{{ customer.name}}</option>
       <!-- 2. TODO implement a select to filter orders by customer name -->
     </select>
     <table>
@@ -43,11 +42,11 @@ export class OrdersPageComponent {
   customers$: Observable<Customer[]>;
   products$: Observable<Product[]>;
   filteredOrders$: Observable<OrderView[]>;
-  constructor(private appDataApiService: AppDataApiService, public commonService: CommonServiceService) {
+  constructor(private appDataApiService: AppDataApiService, public customerService: CustomerService) {
     this.customers$ = this.appDataApiService.customers$;
     this.products$ = this.appDataApiService.products$;
-    this.filteredOrders$ = combineLatest([this.appDataApiService.orders$, this.commonService.selectedCustomer$]).pipe(
-      map(([orders, selectedCustomer]) => selectedCustomer == null ? orders : orders.filter(order => order.customerId == selectedCustomer.id)),
+    this.filteredOrders$ = combineLatest([this.appDataApiService.orders$, this.customerService.selectedCustomer$]).pipe(
+      map(([orders, selectedCustomer]) => selectedCustomer == 0 ? orders : orders.filter(order => order.customerId == selectedCustomer)),
       map((orders) => orders.map(order => {
         return {
           customerName: this.customers$.pipe(map(customers => customers.find(c => c.id == order.customerId)?.name)),
@@ -58,10 +57,12 @@ export class OrdersPageComponent {
       }))
     );
   }
-  ngOnInit(){
-    this.commonService.selectedCustomer$.subscribe(c=> console.log(c))
+  ngOnInit() {
+    this.customerService.selectedCustomer$.subscribe(c=> console.log(c))
   }
-  customerSelected(customer: Customer) {
-    this.commonService.selectedCustomer$.next(customer);
+  customerSelected($event: any) {
+    // (change)="customerSelected($event)" to get the customer.id
+    // console.log($event.target.value)
+    this.customerService.selectedCustomer$.next($event.target.value);
   }
 }

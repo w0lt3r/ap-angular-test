@@ -5,9 +5,9 @@ import { Customer } from '../models/customer.interface';
 @Injectable({
   providedIn: 'root'
 })
-export class CommonServiceService {
-  selectedCustomer$: ReplaySubject<Customer | null | undefined> = new ReplaySubject(1);
-  constructor() { 
-    this.selectedCustomer$.next(null);
+export class CustomerService {
+  selectedCustomer$: ReplaySubject<number> = new ReplaySubject(1);
+  constructor() {
+    this.selectedCustomer$.next(0);
   }
 }

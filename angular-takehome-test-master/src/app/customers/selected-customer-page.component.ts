@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CommonServiceService } from '../app-data/common-service.service';
+import { combineLatest, map, Observable } from 'rxjs';
+import { AppDataApiService } from '../app-data/app-data-api.service';
+import { CustomerService } from '../app-data/customer.service';
 import { Customer } from '../models/customer.interface';
 
 @Component({
@@ -20,9 +21,11 @@ import { Customer } from '../models/customer.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectedCustomerPageComponent {
-  selectedCustomer$: Observable<Customer | null | undefined>;
-  constructor(private commonService: CommonServiceService) {
-    this.selectedCustomer$ = this.commonService.selectedCustomer$;
+  selectedCustomer$: Observable<Customer | undefined>;
+  constructor(private customerService: CustomerService, private appDataApiService: AppDataApiService) {
+    this.selectedCustomer$= combineLatest([this.customerService.selectedCustomer$, this.appDataApiService.customers$]).pipe(
+      map(([customerId, customers])=> customers.find(customer=> customer.id== customerId))
+    );
   }
   ngOnInit() {
   }
