@@ -57,12 +57,7 @@ export class OrdersPageComponent {
       }))
     );
   }
-  ngOnInit() {
-    this.customerService.selectedCustomer$.subscribe(c=> console.log(c))
-  }
   customerSelected($event: any) {
-    // (change)="customerSelected($event)" to get the customer.id
-    // console.log($event.target.value)
     this.customerService.selectedCustomer$.next($event.target.value);
   }
 }
