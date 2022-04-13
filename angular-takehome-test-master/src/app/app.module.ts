@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -38,8 +37,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     HttpClientModule,
     HttpClientInMemoryWebApiModule.forRoot(DbService),
-    CommonModule,
-    FormsModule
+    CommonModule
   ],
   providers: [],
   bootstrap: [AppComponent],
